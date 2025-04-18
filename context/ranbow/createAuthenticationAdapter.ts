@@ -4,8 +4,11 @@ import { createSiweMessage } from 'viem/siwe';
 export const authenticationAdapter = createAuthenticationAdapter({
   getNonce: async () => {
     const response = await fetch('/api/nonce');
-    console.log('getNonce', response)
     
+    if (!response.ok) {
+      throw new Error('Failed to get nonce');
+    }
+
     return await response.text();
   },
 
@@ -20,23 +23,23 @@ export const authenticationAdapter = createAuthenticationAdapter({
       statement: 'Sign in with Ethereum to the app.',
     })
 
-    console.log('Created message:', message)
-
     return message;
   },
 
   verify: async ({ message, signature }) => {
-    console.log('Verifying with:', { message, signature })
-
     const verifyRes = await fetch('/api/verify', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ message, signature }),
     });
 
-    console.log('verifyRes', verifyRes)
+    if (!verifyRes.ok) {
+      const error = await verifyRes.json();
+      console.error('Verification failed:', error);
+      return false;
+    }
 
-    return Boolean(verifyRes.ok);
+    return true;
   },
   
   signOut: async () => {
