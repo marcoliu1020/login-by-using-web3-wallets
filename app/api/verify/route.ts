@@ -1,7 +1,8 @@
-import { NextResponse } from 'next/server';
-import { verifyMessage } from 'viem';
 import { cookies } from 'next/headers';
-import { parseSiweMessage } from 'viem/siwe'
+import { NextResponse } from 'next/server';
+
+import { verifyMessage } from 'viem';
+import { parseSiweMessage } from 'viem/siwe';
 
 export async function POST(request: Request) {
   try {
@@ -15,6 +16,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'No nonce found' }, { status: 400 });
     }
     
+    // parse the message
     const fields = parseSiweMessage(message)
 
     if (!fields.address) {
@@ -33,7 +35,7 @@ export async function POST(request: Request) {
     }
     
     // Verify the nonce matches
-    if (message.nonce !== nonce) {
+    if (fields.nonce !== nonce) {
       return NextResponse.json({ error: 'Invalid nonce' }, { status: 400 });
     }
 
