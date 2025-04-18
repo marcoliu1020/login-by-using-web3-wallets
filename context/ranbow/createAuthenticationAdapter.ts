@@ -4,27 +4,38 @@ import { createSiweMessage } from 'viem/siwe';
 export const authenticationAdapter = createAuthenticationAdapter({
   getNonce: async () => {
     const response = await fetch('/api/nonce');
+    console.log('getNonce', response)
+    
     return await response.text();
   },
 
   createMessage: ({ nonce, address, chainId }) => {
-    return createSiweMessage({
-      domain: window.location.host,
+    const message = createSiweMessage({
       address,
-      statement: 'Sign in with Ethereum to the app.',
+      chainId,
+      domain: window.location.host,
+      nonce,
       uri: window.location.origin,
       version: '1',
-      chainId,
-      nonce,
-    });
+      statement: 'Sign in with Ethereum to the app.',
+    })
+
+    console.log('Created message:', message)
+
+    return message;
   },
 
   verify: async ({ message, signature }) => {
+    console.log('Verifying with:', { message, signature })
+
     const verifyRes = await fetch('/api/verify', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ message, signature }),
     });
+
+    console.log('verifyRes', verifyRes)
+
     return Boolean(verifyRes.ok);
   },
   
