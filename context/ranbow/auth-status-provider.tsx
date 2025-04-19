@@ -9,7 +9,7 @@ import { useAccount } from 'wagmi';
 
 export function AuthStatusProvider({ children }: { children: React.ReactNode }) {
     const { address, isConnected } = useAccount();
-    const { authStatus } = useCheckSiweSession(address ?? '', isConnected);
+    const { authStatus } = useCheckSiweSession(address ?? '');
 
     console.log('----- authStatusProvider -----');
     console.log({ address, isConnected, authStatus });

@@ -27,27 +27,42 @@ export const useLogout = () => {
     return { logout };
 };
 
-export const useCheckSiweSession = (address: string, isConnected: boolean) => {
+export const useCheckSiweSession = (address: string) => {
     const [authStatus, setAuthStatus] = useState<AuthenticationStatus>('loading');
 
     useEffect(() => {
-        if (isConnected && address) {
-            console.log('useCheckSiweSession address:', address);
-            checkAuth();
+        if (!address) {
+            setAuthStatus('unauthenticated');
+            return;
         }
 
-        async function checkAuth() {
-            const response = await fetch(`/api/siwe-session?address=${address}`);
-            const data = await response.json();
-            if (!response.ok) {
-                console.error('useCheckSiweSession error:', data);
-                setAuthStatus('unauthenticated');
-                return;
-            }
-            const { isAuthenticated } = data;
-            setAuthStatus(isAuthenticated ? 'authenticated' : 'unauthenticated');
+        handleAuthStatusChange();
+        
+        window.addEventListener('authStatusChanged', handleAuthStatusChange);
+        
+        return () => {
+            window.removeEventListener('authStatusChanged', handleAuthStatusChange);
         };
-    }, [address, isConnected]);
+
+        // Listen for auth status changes
+        async function handleAuthStatusChange() {
+            const hasAuth = await hasAuthSession(address);
+            setAuthStatus(hasAuth ? 'authenticated' : 'unauthenticated');
+        };
+    }, [address]);
 
     return { authStatus };
 };
+
+async function hasAuthSession(address: string): Promise<boolean> {
+    const response = await fetch(`/api/siwe-session?address=${address}`);
+    const data = await response.json();
+
+    if (!response.ok) {
+        console.error('useCheckSiweSession error:', data);
+        return false;
+    }
+
+    const { isAuthenticated } = data;
+    return isAuthenticated;
+}

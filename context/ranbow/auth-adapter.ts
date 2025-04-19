@@ -40,6 +40,8 @@ export const authenticationAdapter = createAuthenticationAdapter({
       throw new Error('Failed to verify:', data);
     }
 
+    // Dispatch event after successful verification
+    window.dispatchEvent(new CustomEvent('authStatusChanged'));
     return true;
   },
 
