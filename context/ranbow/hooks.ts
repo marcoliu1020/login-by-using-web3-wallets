@@ -33,6 +33,7 @@ export const useCheckSiweSession = () => {
 
     useEffect(() => {
         if (isConnected && address) {
+            console.log('checkAuthStatusWithAddress', address);
             checkAuthStatusWithAddress();
         }
 
