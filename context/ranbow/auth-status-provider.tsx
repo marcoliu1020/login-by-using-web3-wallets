@@ -11,9 +11,9 @@ export function AuthStatusProvider({ children }: { children: React.ReactNode }) 
     const { address, isConnected } = useAccount();
     const { authStatus } = useCheckSiweSession(address ?? '', isConnected);
 
-    console.log('authStatusProvider address', address);
-    console.log('authStatusProvider isConnected', isConnected);
-    console.log('authStatusProvider authStatus', authStatus);
+    console.log('----- authStatusProvider -----');
+    console.log({ address, isConnected, authStatus });
+    console.log('--------------------------------');
 
     return (
         <RainbowKitAuthenticationProvider
