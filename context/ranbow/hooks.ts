@@ -32,11 +32,11 @@ export const useCheckSiweSession = () => {
     const [authStatus, setAuthStatus] = useState<AuthenticationStatus>('loading');
 
     useEffect(() => {
-        if (isConnected) {
-            checkAuthStatus();
+        if (isConnected && address) {
+            checkAuthStatusWithAddress();
         }
 
-        async function checkAuthStatus() {
+        async function checkAuthStatusWithAddress() {
             const response = await fetch(`/api/siwe-session?address=${address}`);
             if (!response.ok) {
                 const error = await response.json();
