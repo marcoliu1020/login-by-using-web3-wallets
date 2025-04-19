@@ -4,7 +4,7 @@ import { createSiweMessage } from 'viem/siwe';
 export const authenticationAdapter = createAuthenticationAdapter({
   getNonce: async () => {
     const response = await fetch('/api/nonce');
-    
+
     if (!response.ok) {
       throw new Error('Failed to get nonce');
     }
@@ -33,15 +33,17 @@ export const authenticationAdapter = createAuthenticationAdapter({
       body: JSON.stringify({ message, signature }),
     });
 
+    const data = await verifyRes.json();
+    console.log('verify data:', data);
+
     if (!verifyRes.ok) {
-      const error = await verifyRes.json();
-      console.error('Verification failed:', error);
+      console.error('Verification failed:', data);
       return false;
     }
 
     return true;
   },
-  
+
   signOut: async () => {
     await fetch('/api/logout');
   },
