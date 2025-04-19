@@ -37,14 +37,15 @@ export const authenticationAdapter = createAuthenticationAdapter({
     console.log('verify data:', data);
 
     if (!verifyRes.ok) {
-      console.error('Verification failed:', data);
-      return false;
+      throw new Error('Failed to verify:', data);
     }
 
     return true;
   },
 
   signOut: async () => {
-    await fetch('/api/logout');
+    const res = await fetch('/api/logout');
+    const data = await res.json();
+    console.log('signOut res:', data);
   },
 });
