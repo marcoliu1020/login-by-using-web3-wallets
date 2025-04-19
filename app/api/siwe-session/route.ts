@@ -12,22 +12,24 @@ export async function GET(request: NextRequest) {
 
   // check session
   const cookieStore = await cookies();
-  const session = cookieStore.get('siwe-session')?.value;
-  if (!session) {
+  const sessionCookie = cookieStore.get('siwe-session')?.value;
+  if (!sessionCookie) {
     return NextResponse.json({ error: 'No session found' }, { status: 400 });
   }
 
-  // check could parse session
+  // check could parse session cookie
   try {
-    JSON.parse(session);
+    JSON.parse(sessionCookie);
   } catch (error) {
-    console.error('Invalid session:', error);
-    return NextResponse.json({ error: 'Invalid session' }, { status: 400 });
+    console.error('Invalid session cookie:', error);
+    return NextResponse.json({ error: 'Invalid session cookie' }, { status: 400 });
   }
 
-  // ✅ check session data is valid
-  const sessionData: SiweSessionCookie = JSON.parse(session);
-  const isAuthenticated = sessionData.address === address && sessionData.authStatus === 'authenticated';
+  // ✅ check session cookie is valid
+  const sessionJson: SiweSessionCookie = JSON.parse(sessionCookie);
+  const isAuthenticated =
+    sessionJson.address === address &&
+    sessionJson.authStatus === 'authenticated';
 
   return NextResponse.json(
     { isAuthenticated },
