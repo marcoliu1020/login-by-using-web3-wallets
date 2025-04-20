@@ -1,15 +1,19 @@
 import { createAuthenticationAdapter } from '@rainbow-me/rainbowkit';
 import { createSiweMessage } from 'viem/siwe';
 
+import { logMessage, logError } from '@/util/log';
+
 export const authenticationAdapter = createAuthenticationAdapter({
   getNonce: async () => {
     const response = await fetch('/api/nonce');
+    const data = await response.text();
 
     if (!response.ok) {
-      throw new Error('Failed to get nonce');
+      logError('Failed to get nonce');
+      return '';
     }
 
-    return await response.text();
+    return data;
   },
 
   createMessage: ({ nonce, address, chainId }) => {
@@ -27,17 +31,16 @@ export const authenticationAdapter = createAuthenticationAdapter({
   },
 
   verify: async ({ message, signature }) => {
-    const verifyRes = await fetch('/api/verify', {
+    const response = await fetch('/api/verify', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ message, signature }),
     });
+    const data = await response.json();
 
-    const data = await verifyRes.json();
-    console.log('verify data:', data);
-
-    if (!verifyRes.ok) {
-      throw new Error('Failed to verify:', data);
+    if (!response.ok) {
+      logError('Failed to verify:', data);
+      return false;
     }
 
     // Dispatch event after successful verification
@@ -46,8 +49,13 @@ export const authenticationAdapter = createAuthenticationAdapter({
   },
 
   signOut: async () => {
-    const res = await fetch('/api/logout');
-    const data = await res.json();
-    console.log('signOut res:', data);
+    const response = await fetch('/api/logout');
+    const data = await response.json();
+
+    if (!response.ok) {
+      logError('Failed to sign out:', data);
+    }
+
+    logMessage('signOut res:', data);
   },
 });

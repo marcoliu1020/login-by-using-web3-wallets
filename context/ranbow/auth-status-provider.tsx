@@ -1,18 +1,24 @@
-import { RainbowKitAuthenticationProvider } from "@rainbow-me/rainbowkit";
+import { type AuthenticationStatus, RainbowKitAuthenticationProvider } from "@rainbow-me/rainbowkit";
 
 // adapters
 import { authenticationAdapter } from './auth-adapter';
 
 // hooks
-import { useCheckSiweSession } from './hooks';
 import { useAccount } from 'wagmi';
+import { useSiweSession } from './hook/useSiweSession';
 
 export function AuthStatusProvider({ children }: { children: React.ReactNode }) {
     const { address, isConnected } = useAccount();
-    const { authStatus } = useCheckSiweSession(address ?? '');
+    const { hasSession } = useSiweSession(address ?? '');
+
+    // determine auth status
+    let authStatus: AuthenticationStatus = 'loading';
+    if (isConnected) {
+        authStatus = hasSession ? 'authenticated' : 'unauthenticated';
+    }
 
     console.log('----- authStatusProvider -----');
-    console.log({ address, isConnected, authStatus });
+    console.log({ address, isConnected, hasSession, authStatus });
     console.log('--------------------------------');
 
     return (
