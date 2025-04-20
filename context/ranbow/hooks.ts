@@ -1,68 +1,63 @@
-import { useAccount } from 'wagmi';
 import { useEffect, useState } from 'react';
 
-// types
-import { type AuthenticationStatus } from '@rainbow-me/rainbowkit';
+export const useHasSiweSession = (address: string): {
+    hasSession: boolean,
+    isLoading: boolean,
+    error: Error | null
+} => {
+    const [hasSession, setHasSession] = useState<boolean>(false);
+    const [isLoading, setIsLoading] = useState<boolean>(true);
+    const [error, setError] = useState<Error | null>(null);
 
-export const useLogout = () => {
-    const { isDisconnected, address } = useAccount();
+    const handleInitialAuthStatus = () => {
+        setHasSession(false);
+        setIsLoading(true);
+        setError(null);
+    }
+    const handleHasSessionStatus = (hasAuth: boolean) => {
+        setHasSession(hasAuth);
+        setIsLoading(false);
+        setError(null);
+    }
+    const haveAuthSession = async (address: string) => {
+        const response = await fetch(`/api/siwe-session?address=${address}`);
+        const data = await response.json();
 
-    const logout = async () => {
-        try {
-            await fetch('/api/logout', {
-                method: 'POST',
-            });
-        } catch (error) {
-            console.error('Failed to logout:', error);
+        if (!response.ok) {
+            console.error('useCheckSiweSession error:', data);
+            return false;
         }
-    };
 
-    useEffect(() => {
-        console.log({ isDisconnected, address });
-        if (isDisconnected && !address) {
-            logout();
-        }
-    }, [isDisconnected, address]);
-
-    return { logout };
-};
-
-export const useCheckSiweSession = (address: string) => {
-    const [authStatus, setAuthStatus] = useState<AuthenticationStatus>('loading');
+        return true;
+    }
 
     useEffect(() => {
         if (!address) {
-            setAuthStatus('unauthenticated');
+            handleHasSessionStatus(false);
             return;
         }
 
         handleAuthStatusChange();
-        
+
         window.addEventListener('authStatusChanged', handleAuthStatusChange);
-        
         return () => {
             window.removeEventListener('authStatusChanged', handleAuthStatusChange);
         };
 
         // Listen for auth status changes
         async function handleAuthStatusChange() {
-            const hasAuth = await hasAuthSession(address);
-            setAuthStatus(hasAuth ? 'authenticated' : 'unauthenticated');
+            handleInitialAuthStatus();
+            try {
+                const hasAuth = await haveAuthSession(address);
+                handleHasSessionStatus(hasAuth);
+            } catch (error) {
+                console.error('Failed to check auth status:', error);
+                setError(error as Error);
+            } finally {
+                setIsLoading(false);
+            }
         };
     }, [address]);
 
-    return { authStatus };
+    return { hasSession, isLoading, error };
 };
-
-async function hasAuthSession(address: string): Promise<boolean> {
-    const response = await fetch(`/api/siwe-session?address=${address}`);
-    const data = await response.json();
-
-    if (!response.ok) {
-        console.error('useCheckSiweSession error:', data);
-        return false;
-    }
-
-    const { isAuthenticated } = data;
-    return isAuthenticated;
-}
