@@ -50,7 +50,9 @@ export const authenticationAdapter = createAuthenticationAdapter({
   },
 
   signOut: async () => {
-    const response = await fetch('/api/logout');
+    const response = await fetch('/api/logout', {
+      method: 'POST'
+    });
     const data = await response.json();
 
     if (!response.ok) {
