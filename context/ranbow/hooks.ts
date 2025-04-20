@@ -1,25 +1,33 @@
 import { useEffect, useState } from 'react';
 
-export const useHasSiweSession = (address: string): {
+export const useSiweSession = (address: string): {
     hasSession: boolean,
     isLoading: boolean,
     error: Error | null
 } => {
+    // state
     const [hasSession, setHasSession] = useState<boolean>(false);
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [error, setError] = useState<Error | null>(null);
 
-    const handleInitialAuthStatus = () => {
+    // handlers
+    const handleInitialSessionStatus = () => {
         setHasSession(false);
         setIsLoading(true);
         setError(null);
     }
-    const handleHasSessionStatus = (hasAuth: boolean) => {
-        setHasSession(hasAuth);
+    const handleHasSessionStatus = (hasSession: boolean) => {
+        setHasSession(hasSession);
         setIsLoading(false);
         setError(null);
     }
-    const haveAuthSession = async (address: string) => {
+    const handleError = (error: Error) => {
+        setHasSession(false);
+        setIsLoading(false);
+        setError(error);
+        console.log('useSiweSession error:', error);
+    }
+    const hasAuthSession = async (address: string) => {
         const response = await fetch(`/api/siwe-session?address=${address}`);
         const data = await response.json();
 
@@ -31,30 +39,29 @@ export const useHasSiweSession = (address: string): {
         return true;
     }
 
+    // effects
     useEffect(() => {
-        if (!address) {
-            handleHasSessionStatus(false);
-            return;
-        }
-
         handleAuthStatusChange();
 
         window.addEventListener('authStatusChanged', handleAuthStatusChange);
+
         return () => {
             window.removeEventListener('authStatusChanged', handleAuthStatusChange);
         };
 
-        // Listen for auth status changes
         async function handleAuthStatusChange() {
-            handleInitialAuthStatus();
+            handleInitialSessionStatus();
+
+            if (!address) {
+                handleHasSessionStatus(false);
+                return;
+            }
+    
             try {
-                const hasAuth = await haveAuthSession(address);
+                const hasAuth = await hasAuthSession(address);
                 handleHasSessionStatus(hasAuth);
             } catch (error) {
-                console.error('Failed to check auth status:', error);
-                setError(error as Error);
-            } finally {
-                setIsLoading(false);
+                handleError(error as Error);
             }
         };
     }, [address]);
