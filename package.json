@@ -1,5 +1,5 @@
 {
-  "name": "test-login-with-tg-and-metamask",
+  "name": "login-by-using-web3-wallets",
   "version": "0.1.0",
   "private": true,
   "scripts": {
