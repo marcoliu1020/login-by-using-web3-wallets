@@ -1,9 +1,15 @@
+import { logError } from '@/util/log';
 import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
 
+// web3 wallet
 import { verifyMessage } from 'viem';
 import { parseSiweMessage } from 'viem/siwe';
 
+// constant
+import { COOKIE_NONCE, COOKIE_SIWE_SESSION } from '../constant';
+
+// type
 import type { SiweSessionCookie } from '../type';
 
 export async function POST(request: Request) {
@@ -12,15 +18,13 @@ export async function POST(request: Request) {
 
     // Get the nonce from the cookie
     const cookieStore = await cookies();
-    const nonce = cookieStore.get('siwe-nonce')?.value;
-
+    const nonce = cookieStore.get(COOKIE_NONCE)?.value;
     if (!nonce) {
       return NextResponse.json({ error: 'No nonce found' }, { status: 400 });
     }
 
-    // parse the message
+    // Parse the message
     const fields = parseSiweMessage(message)
-
     if (!fields.address) {
       return NextResponse.json({ error: 'No address found' }, { status: 400 });
     }
@@ -31,18 +35,17 @@ export async function POST(request: Request) {
       message,
       signature,
     });
-
     if (!isValid) {
       return NextResponse.json({ error: 'Invalid signature' }, { status: 400 });
     }
 
-    // Verify the nonce matches
+    // Verify the cookie's nonce matches message's nonce
     if (fields.nonce !== nonce) {
       return NextResponse.json({ error: 'Invalid nonce' }, { status: 400 });
     }
 
     // Set a response
-    const response = NextResponse.json({ success: true });
+    const response = NextResponse.json({ success: true }, { status: 200 });
 
     // Set a session cookie
     const sessionCookie: SiweSessionCookie = {
@@ -50,7 +53,7 @@ export async function POST(request: Request) {
       authStatus: 'authenticated'
     }
     response.cookies.set(
-      'siwe-session',
+      COOKIE_SIWE_SESSION,
       JSON.stringify(sessionCookie),
       {
         httpOnly: true,
@@ -61,7 +64,7 @@ export async function POST(request: Request) {
 
     return response;
   } catch (error) {
-    console.error('Verification error:', error);
+    logError(error);
     return NextResponse.json({ error: 'Verification failed' }, { status: 500 });
   }
 } 

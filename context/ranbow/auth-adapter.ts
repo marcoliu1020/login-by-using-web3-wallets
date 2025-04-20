@@ -1,7 +1,8 @@
+import { logError, logMessage } from '@/util/log';
+
+// web3 wallet
 import { createAuthenticationAdapter } from '@rainbow-me/rainbowkit';
 import { createSiweMessage } from 'viem/siwe';
-
-import { logMessage, logError } from '@/util/log';
 
 export const authenticationAdapter = createAuthenticationAdapter({
   getNonce: async () => {

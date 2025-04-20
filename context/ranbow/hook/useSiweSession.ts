@@ -1,6 +1,5 @@
-import { useEffect, useState } from 'react';
-
 import { logError } from '@/util/log';
+import { useEffect, useState } from 'react';
 
 export type SiweSession = {
     hasSession: boolean,
