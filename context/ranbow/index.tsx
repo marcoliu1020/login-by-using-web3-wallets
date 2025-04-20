@@ -6,7 +6,7 @@ import '@rainbow-me/rainbowkit/styles.css';
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { WagmiProvider } from 'wagmi';
 import { AuthStatusProvider } from './auth-status-provider';
-import { config } from './config';
+import { config } from './wagmi';
 
 const queryClient = new QueryClient();
 
