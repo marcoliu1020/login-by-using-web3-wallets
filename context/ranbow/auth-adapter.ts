@@ -4,6 +4,9 @@ import { logError, logMessage } from '@/util/log';
 import { createAuthenticationAdapter } from '@rainbow-me/rainbowkit';
 import { createSiweMessage } from 'viem/siwe';
 
+// constant
+import { EVENT_AUTH_STATUS_CHANGED } from './constant';
+
 export const authenticationAdapter = createAuthenticationAdapter({
   getNonce: async () => {
     // TODO: get nonce
@@ -47,7 +50,7 @@ export const authenticationAdapter = createAuthenticationAdapter({
     }
 
     // Dispatch event after successful verification
-    window.dispatchEvent(new CustomEvent('authStatusChanged'));
+    window.dispatchEvent(new CustomEvent(EVENT_AUTH_STATUS_CHANGED));
     return true;
   },
 

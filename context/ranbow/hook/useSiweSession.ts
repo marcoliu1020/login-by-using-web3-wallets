@@ -1,6 +1,9 @@
 import { logError } from '@/util/log';
 import { useEffect, useState } from 'react';
 
+// constant
+import { EVENT_AUTH_STATUS_CHANGED } from '../constant';
+
 export type SiweSession = {
     hasSession: boolean,
     isLoading: boolean,
@@ -47,10 +50,10 @@ export const useSiweSession = (address: string): SiweSession => {
     useEffect(() => {
         handleAuthStatusChange();
 
-        window.addEventListener('authStatusChanged', handleAuthStatusChange);
+        window.addEventListener(EVENT_AUTH_STATUS_CHANGED, handleAuthStatusChange);
 
         return () => {
-            window.removeEventListener('authStatusChanged', handleAuthStatusChange);
+            window.removeEventListener(EVENT_AUTH_STATUS_CHANGED, handleAuthStatusChange);
         };
 
         async function handleAuthStatusChange() {
