@@ -18,4 +18,5 @@ export const config = getDefaultConfig({
       }
     ],
     ssr: true, // If your dApp uses server side rendering (SSR)
+    multiInjectedProviderDiscovery: false, // hide injected wallets
 });
