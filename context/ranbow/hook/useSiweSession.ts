@@ -1,33 +1,36 @@
 import { useEffect, useState } from 'react';
 
-export const useSiweSession = (address: string): {
+export type SiweSession = {
     hasSession: boolean,
     isLoading: boolean,
     error: Error | null
-} => {
+}
+
+export const useSiweSession = (address: string): SiweSession => {
     // state
     const [hasSession, setHasSession] = useState<boolean>(false);
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [error, setError] = useState<Error | null>(null);
 
     // handlers
-    const handleInitialSessionStatus = () => {
+    const handleInitialState = () => {
         setHasSession(false);
         setIsLoading(true);
         setError(null);
     }
-    const handleHasSessionStatus = (hasSession: boolean) => {
+    const handleHasSessionState = (hasSession: boolean) => {
         setHasSession(hasSession);
         setIsLoading(false);
         setError(null);
     }
-    const handleError = (error: Error) => {
+    const handleErrorState = (error: Error) => {
         setHasSession(false);
         setIsLoading(false);
         setError(error);
         console.log('useSiweSession error:', error);
     }
     const hasAuthSession = async (address: string) => {
+        // TODO: add your api call here
         const response = await fetch(`/api/siwe-session?address=${address}`);
         const data = await response.json();
 
@@ -50,18 +53,18 @@ export const useSiweSession = (address: string): {
         };
 
         async function handleAuthStatusChange() {
-            handleInitialSessionStatus();
+            handleInitialState();
 
             if (!address) {
-                handleHasSessionStatus(false);
+                handleHasSessionState(false);
                 return;
             }
     
             try {
                 const hasAuth = await hasAuthSession(address);
-                handleHasSessionStatus(hasAuth);
+                handleHasSessionState(hasAuth);
             } catch (error) {
-                handleError(error as Error);
+                handleErrorState(error as Error);
             }
         };
     }, [address]);
