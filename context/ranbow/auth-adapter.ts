@@ -6,6 +6,7 @@ import { createSiweMessage } from 'viem/siwe';
 
 export const authenticationAdapter = createAuthenticationAdapter({
   getNonce: async () => {
+    // TODO: get nonce
     const response = await fetch('/api/nonce');
     const data = await response.text();
 
@@ -32,6 +33,7 @@ export const authenticationAdapter = createAuthenticationAdapter({
   },
 
   verify: async ({ message, signature }) => {
+    // TODO: verify the message and signature
     const response = await fetch('/api/verify', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -50,6 +52,7 @@ export const authenticationAdapter = createAuthenticationAdapter({
   },
 
   signOut: async () => {
+    // TODO: sign out the user
     const response = await fetch('/api/logout', {
       method: 'POST'
     });
