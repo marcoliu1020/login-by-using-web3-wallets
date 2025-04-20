@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
 
+import { logError } from '@/util/log';
+
 export type SiweSession = {
     hasSession: boolean,
     isLoading: boolean,
@@ -27,7 +29,7 @@ export const useSiweSession = (address: string): SiweSession => {
         setHasSession(false);
         setIsLoading(false);
         setError(error);
-        console.log('useSiweSession error:', error);
+        logError(error); // TODO: log error to sentry
     }
     const hasAuthSession = async (address: string) => {
         // TODO: add your api call here
@@ -35,7 +37,7 @@ export const useSiweSession = (address: string): SiweSession => {
         const data = await response.json();
 
         if (!response.ok) {
-            console.error('useCheckSiweSession error:', data);
+            logError(data); // TODO: log error to sentry
             return false;
         }
 
