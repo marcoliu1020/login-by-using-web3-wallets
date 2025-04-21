@@ -1,6 +1,6 @@
 'use client';
 
-// web3 wallet
+// rainbow wallet
 import { RainbowKitProvider } from '@rainbow-me/rainbowkit';
 import '@rainbow-me/rainbowkit/styles.css';
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
