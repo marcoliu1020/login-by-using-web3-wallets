@@ -15,7 +15,7 @@ export function RainbowProvider({ children }: { children: React.ReactNode }) {
         <WagmiProvider config={config}>
             <QueryClientProvider client={queryClient}>
                 <AuthStatusProvider>
-                    <RainbowKitProvider>
+                    <RainbowKitProvider modalSize="compact">
                         {children}
                     </RainbowKitProvider>
                 </AuthStatusProvider>
