@@ -3,7 +3,6 @@
 import { getDefaultConfig } from '@rainbow-me/rainbowkit';
 import {
   metaMaskWallet,
-  phantomWallet,
   walletConnectWallet,
 } from '@rainbow-me/rainbowkit/wallets';
 import { arbitrum, base, bsc, mainnet } from 'wagmi/chains';
@@ -15,7 +14,7 @@ export const config = getDefaultConfig({
   wallets: [
     {
       groupName: 'Recommended',
-      wallets: [metaMaskWallet, phantomWallet, walletConnectWallet]
+      wallets: [metaMaskWallet, walletConnectWallet]
     }
   ],
   ssr: true, // If your dApp uses server side rendering (SSR)
